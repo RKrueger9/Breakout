@@ -16,18 +16,17 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate
     var paddle = UIView()
     var ball = UIView()
     var brick = UIView()
-    var lives = 100;
+    var lives = 5;
     var collisionBehavior = UICollisionBehavior()
     var bricks : [UIView] = []
     var allObjects : [UIView] = []
-    var allHidden = false
+    var allDynamicBehavoirs : [UIDynamicItemBehavior] = []
     var brickCount = 0
     
     override func viewDidLoad()
     {
         super.viewDidLoad()
         resetGame()
-        
     }
     
     func resetGame()
@@ -46,11 +45,11 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate
         allObjects.append(paddle)
         view.addSubview(paddle)
         
-        //add brick to view
-        
-        addBlock(20, y: 40, color: UIColor.blueColor())
-        addBlock(80, y: 40, color: UIColor.blueColor())
-        addBlock(20, y: 80, color: UIColor.yellowColor())
+        //add rows of bricks to view
+        addRows(40, color: UIColor.blueColor())
+        addRows(70, color: UIColor.yellowColor())
+        addRows(100, color: UIColor.purpleColor())
+       
         
         dynamicAnimator = UIDynamicAnimator(referenceView: view)
         
@@ -61,6 +60,8 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate
         ballDynamicBehavior.elasticity = 1.0
         ballDynamicBehavior.allowsRotation = false
         dynamicAnimator.addBehavior(ballDynamicBehavior)
+        allDynamicBehavoirs.append(ballDynamicBehavior)
+      
         
         //create dynamic behavior for ball
         let paddleDynamicBehavior = UIDynamicItemBehavior(items: [paddle])
@@ -68,8 +69,7 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate
         paddleDynamicBehavior.resistance = 100
         paddleDynamicBehavior.allowsRotation = false
         dynamicAnimator.addBehavior(paddleDynamicBehavior)
-        
-        
+        allDynamicBehavoirs.append(paddleDynamicBehavior)
         
         //create dynamic behavior for brick
         let brickDynamicBehavior = UIDynamicItemBehavior(items: bricks)
@@ -77,6 +77,8 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate
         brickDynamicBehavior.resistance = 100
         brickDynamicBehavior.allowsRotation = false
         dynamicAnimator.addBehavior(brickDynamicBehavior)
+        allDynamicBehavoirs.append(brickDynamicBehavior)
+
         
         //creates a push behavoir to get the ball moving
         let pushBehavior = UIPushBehavior(items: [ball], mode: .Instantaneous)
@@ -95,6 +97,7 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate
 
     }
     
+    
     func collisionBehavior(behavior: UICollisionBehavior, beganContactForItem item: UIDynamicItem, withBoundaryIdentifier identifier: NSCopying?, atPoint p: CGPoint) {
         
         if(item.isEqual(ball) && p.y > paddle.center.y)
@@ -111,29 +114,43 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate
             {
                 livesLabel.text = "Game Over"
                 endGame()
+                callLoseAlert()
             }
         }
     }
     
     func collisionBehavior(behavior: UICollisionBehavior, beganContactForItem item1: UIDynamicItem, withItem item2: UIDynamicItem, atPoint p: CGPoint)
     {
-        if (item1.isEqual(ball) && item2.isEqual(brick) || item1.isEqual(brick) && item2.isEqual(paddle))
+        for brick in bricks
         {
-            if brick.backgroundColor == UIColor.blueColor()
+            if (item1.isEqual(ball) && item2.isEqual(brick) || item1.isEqual(brick) && item2.isEqual(ball))
             {
-                brick.backgroundColor = UIColor.yellowColor()
-            }
-            else
-            {
-                collisionBehavior.removeItem(brick)
-                brick.hidden = true
-                checkBricksHidden()
-                if(allHidden == true)
+                if brick.backgroundColor == UIColor.blueColor()
                 {
-                    livesLabel.text = "You Won"
-                    endGame()
+                    brick.backgroundColor = UIColor.yellowColor()
+                }
+                else if(brick.backgroundColor == UIColor.yellowColor())
+                {
+                    brick.backgroundColor = UIColor.purpleColor()
+                }
+                else
+                {
+                    collisionBehavior.removeItem(brick)
+                    brick.hidden = true
+                    checkGameOver()
                 }
             }
+        }
+    }
+    
+    func addRows(z: CGFloat, color: UIColor)
+    {
+        let width = (Int)(view.bounds.size.width - 40)
+        let xOffset = ((Int)(view.bounds.size.width) % 42 / 2)
+        for var i = xOffset; i < width; i += 60
+        {
+            let x = CGFloat(i);
+            addBlock(x, y: z, color: color)
         }
     }
     
@@ -144,7 +161,11 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate
         {
             all.removeFromSuperview()
         }
-
+        //empties arrays and resets other variables
+        allObjects.removeAll()
+        bricks.removeAll()
+        brickCount = 0;
+        lives = 5
     }
     
     func addBlock(x: CGFloat, y: CGFloat, color: UIColor)
@@ -156,19 +177,48 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate
         view.addSubview(brick)
     }
     
-    func checkBricksHidden()
+    func checkGameOver()
     {
-        for brick in bricks
+        if(brick.hidden == true)
         {
-            if(brick.hidden == true)
+            ++brickCount
+            if(brickCount == bricks.count)
             {
-                brickCount++
-                if(brickCount == bricks.count)
-                {
-                    allHidden = true
-                }
+                livesLabel.text = "You Win!"
+                endGame()
+                callWinAlert()
             }
         }
+        
+    }
+    
+    func callWinAlert()
+    {
+        let alert = UIAlertController(title: "You Win!", message: nil, preferredStyle: .Alert)
+        let resetAction = UIAlertAction(title: "Play Again", style: .Default) { (action) -> Void in
+            self.resetGame()
+        }
+        alert.addAction(resetAction)
+        let quitAction = UIAlertAction(title: "Quit", style: .Default) { (action) -> Void in
+            //
+        }
+        alert.addAction(quitAction)
+        self.presentViewController(alert, animated: true, completion: nil);
+    }
+    
+    func callLoseAlert()
+    {
+        let alert = UIAlertController(title: "You Lose!", message: nil, preferredStyle: .Alert)
+        let resetAction = UIAlertAction(title: "Try Again", style: .Default) { (action) -> Void in
+            self.resetGame()
+        }
+        alert.addAction(resetAction)
+        let quitAction = UIAlertAction(title: "Rage quit", style: .Default) { (action) -> Void in
+           //
+        }
+        alert.addAction(quitAction)
+        self.presentViewController(alert, animated: true, completion: nil);
+
     }
     
     @IBAction func panGesture(sender: UIPanGestureRecognizer)

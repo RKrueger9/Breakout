@@ -19,7 +19,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Lives:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Io-ru-Ngk">
-                                <rect key="frame" x="-3" y="571" width="100" height="25"/>
+                                <rect key="frame" x="20" y="567" width="100" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="100" id="PTZ-p9-dRt"/>
                                     <constraint firstAttribute="height" constant="25" id="uZM-dn-94t"/>
@@ -32,8 +32,8 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
                         <constraints>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="8Io-ru-Ngk" secondAttribute="bottom" constant="4" id="HEl-vS-BkR"/>
-                            <constraint firstItem="8Io-ru-Ngk" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-23" id="VsD-W9-1vS"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="8Io-ru-Ngk" secondAttribute="bottom" constant="8" id="YDW-wi-fcY"/>
+                            <constraint firstItem="8Io-ru-Ngk" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="y7s-Ym-fGG"/>
                         </constraints>
                         <connections>
                             <outletCollection property="gestureRecognizers" destination="i1p-X6-umu" appends="YES" id="wF6-Ku-kgi"/>
