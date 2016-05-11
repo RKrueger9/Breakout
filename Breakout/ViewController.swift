@@ -94,7 +94,6 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate
         dynamicAnimator.addBehavior(collisionBehavior)
         
         livesLabel.text = "Lives: \(lives)"
-
     }
     
     
@@ -147,7 +146,7 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate
     {
         let width = (Int)(view.bounds.size.width - 40)
         let xOffset = ((Int)(view.bounds.size.width) % 42 / 2)
-        for var i = xOffset; i < width; i += 60
+        for var i = xOffset; i < width; i += 50
         {
             let x = CGFloat(i);
             addBlock(x, y: z, color: color)
@@ -227,8 +226,6 @@ class ViewController: UIViewController, UICollisionBehaviorDelegate
         paddle.center = CGPointMake(panGesture.x, paddle.center.y)
         dynamicAnimator.updateItemUsingCurrentState(paddle)
     }
-    
-    
 }
 
 
